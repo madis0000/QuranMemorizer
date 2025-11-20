@@ -1,0 +1,145 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useParams, useSearchParams, useRouter } from 'next/navigation';
+import { PracticeMode } from '@/components/PracticeMode';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, Loader2 } from 'lucide-react';
+import { SURAHS } from '@/data/quranData';
+import { useUIStore } from '@/store/useUIStore';
+
+interface VerseData {
+  key: string;
+  text: string;
+  audioUrl?: string;
+  translation?: string;
+  hasTajweed?: boolean;
+}
+
+export default function SurahPracticePage() {
+  const params = useParams();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const surahNumber = params.surahNumber as string;
+  const verseNumber = searchParams.get('verse') || '1';
+  const verseKey = `${surahNumber}:${verseNumber}`;
+
+  const [verseData, setVerseData] = useState<VerseData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Get UI preferences
+  const { arabicFont } = useUIStore();
+
+  // Get surah metadata to check total verses
+  const surahInfo = SURAHS.find(s => s.number === parseInt(surahNumber));
+  const totalVerses = surahInfo?.verses || 0;
+  const currentVerseNum = parseInt(verseNumber);
+  const isLastVerse = currentVerseNum >= totalVerses;
+
+  useEffect(() => {
+    async function fetchVerse() {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const response = await fetch(
+          `/api/quran/verse?key=${verseKey}&translation=en-sahih-international&audio=ar.alafasy&textType=${arabicFont}&tajweed=true`
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch verse');
+        }
+
+        const data = await response.json();
+        setVerseData({
+          key: verseKey,
+          text: data.text,
+          audioUrl: data.audioUrl,
+          translation: data.translation,
+          hasTajweed: data.hasTajweed || false,
+        });
+      } catch (err) {
+        console.error('Error fetching verse:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load verse');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchVerse();
+  }, [verseKey, arabicFont]);
+
+  const handleClose = () => {
+    router.push('/memorize');
+  };
+
+  const handleNextVerse = () => {
+    const nextVerse = parseInt(verseNumber) + 1;
+    router.push(`/memorize/${surahNumber}?verse=${nextVerse}`);
+  };
+
+  const handlePreviousVerse = () => {
+    const prevVerse = Math.max(1, parseInt(verseNumber) - 1);
+    router.push(`/memorize/${surahNumber}?verse=${prevVerse}`);
+  };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center space-y-4">
+            <Loader2 className="w-12 h-12 animate-spin mx-auto text-primary" />
+            <p className="text-muted-foreground">Loading verse...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !verseData) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Card className="max-w-2xl mx-auto">
+          <CardHeader>
+            <CardTitle className="text-destructive">Error Loading Verse</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-muted-foreground">
+              {error || 'Unable to load the verse. Please try again.'}
+            </p>
+            <Button onClick={handleClose} variant="outline">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Memorize
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="mb-6">
+        <Button onClick={handleClose} variant="outline" size="sm">
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Surah Selection
+        </Button>
+      </div>
+
+      <PracticeMode
+        verseKey={verseData.key}
+        arabicText={verseData.text}
+        audioUrl={verseData.audioUrl}
+        onClose={handleClose}
+        onNextVerse={isLastVerse ? undefined : handleNextVerse}
+        onPreviousVerse={handlePreviousVerse}
+        currentVerse={parseInt(verseNumber)}
+        totalVerses={totalVerses}
+        hasTajweed={verseData.hasTajweed}
+      />
+    </div>
+  );
+}

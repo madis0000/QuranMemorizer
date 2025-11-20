@@ -1,0 +1,116 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 142 47% 16%;
+    --card: 0 0% 100%;
+    --card-foreground: 142 47% 16%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 142 47% 16%;
+    --primary: 142 47% 21%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 142 20% 94%;
+    --secondary-foreground: 142 47% 16%;
+    --muted: 142 20% 96%;
+    --muted-foreground: 142 10% 45%;
+    --accent: 45 100% 50%;
+    --accent-foreground: 142 47% 16%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 142 20% 88%;
+    --input: 142 20% 88%;
+    --ring: 142 47% 21%;
+    --radius: 0.5rem;
+    --chart-1: 142 70% 50%;
+    --chart-2: 45 100% 50%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+  }
+
+  .dark {
+    --background: 142 47% 4%;
+    --foreground: 0 0% 98%;
+    --card: 142 40% 6%;
+    --card-foreground: 0 0% 98%;
+    --popover: 142 40% 6%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 142 47% 21%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 142 20% 12%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 142 20% 12%;
+    --muted-foreground: 142 10% 60%;
+    --accent: 45 100% 50%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 142 20% 18%;
+    --input: 142 20% 18%;
+    --ring: 142 47% 77%;
+    --chart-1: 142 70% 45%;
+    --chart-2: 45 100% 55%;
+    --chart-3: 197 37% 35%;
+    --chart-4: 43 74% 60%;
+    --chart-5: 27 87% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Arabic font styling */
+.arabic-text {
+  font-family: 'Amiri', serif;
+  direction: rtl;
+  text-align: right;
+  line-height: 2;
+  font-size: 1.5rem;
+}
+
+/* Tajweed color classes - Traditional Quran color scheme */
+.tajweed-text {
+  font-family: 'Amiri', serif;
+  direction: rtl;
+  text-align: right;
+  line-height: 2.5;
+  font-size: inherit;
+}
+
+/* All Tajweed colors are now applied via inline styles in TajweedText component */
+
+/* Smooth transitions */
+@layer utilities {
+  .transition-smooth {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary) / 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary) / 0.5);
+}

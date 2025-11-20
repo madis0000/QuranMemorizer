@@ -1,0 +1,133 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Practice session data - each time a verse is practiced
+model PracticeSession {
+  id           String   @id @default(cuid())
+  verseKey     String   // Format: "2:1" (surah:verse)
+  accuracy     Float    // Percentage 0-100
+  totalWords   Int
+  correctWords Int
+  duration     Int?     // Duration in milliseconds
+  perfectWords Int      @default(0) // Words correct on first try (Memory Mode)
+  isMemoryMode Boolean  @default(false)
+  difficulty   String?  // Memory difficulty: easy, medium, hard
+  strictness   String?  // Matching strictness: lenient, medium, strict
+  createdAt    DateTime @default(now())
+
+  @@index([verseKey, createdAt])
+  @@index([createdAt])
+}
+
+// User settings/preferences
+model UserSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique // Setting name (e.g., "isMemoryMode", "memoryDifficulty")
+  value     String   // Setting value as JSON string
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@index([key])
+}
+
+// Verse-specific progress tracking
+model VerseProgress {
+  id              String   @id @default(cuid())
+  verseKey        String   @unique // Format: "2:1"
+  totalAttempts   Int      @default(0)
+  bestAccuracy    Float    @default(0) // Best accuracy percentage
+  averageAccuracy Float    @default(0) // Average accuracy
+  lastPracticed   DateTime @updatedAt
+  firstPracticed  DateTime @default(now())
+  isPerfect       Boolean  @default(false) // Ever achieved 100% accuracy
+  streak          Int      @default(0) // Consecutive days practiced
+
+  @@index([verseKey])
+  @@index([lastPracticed])
+}
+
+// Daily statistics for progress tracking
+model DailyStats {
+  id              String   @id @default(cuid())
+  date            DateTime @unique @default(now()) @db.Date
+  versesPracticed Int      @default(0)
+  totalWords      Int      @default(0)
+  correctWords    Int      @default(0)
+  practiceTime    Int      @default(0) // Total practice time in milliseconds
+  averageAccuracy Float    @default(0)
+
+  @@index([date])
+}
+
+// ============================================
+// QURAN DATA MODELS
+// ============================================
+
+// Surahs (Chapters) - 114 total
+model Surah {
+  id              Int       @id @default(autoincrement())
+  number          Int       @unique // 1-114
+  nameArabic      String    // e.g., "الفاتحة"
+  nameEnglish     String    // e.g., "Al-Fatihah"
+  nameSimple      String    // e.g., "Al-Fatihah"
+  revelationType  String    // "Meccan" or "Medinan"
+  versesCount     Int       // Number of verses in this surah
+  bismillahPre    Boolean   @default(true) // Has Bismillah at the beginning
+
+  verses          Verse[]
+
+  @@index([number])
+}
+
+// Verses (Ayahs) - 6,236 total
+model Verse {
+  id                  Int       @id @default(autoincrement())
+  surahId             Int
+  verseNumber         Int       // Verse number within the surah
+  verseKey            String    @unique  // Format: "1:1", "2:255", etc.
+
+  // Arabic Text Variants
+  textUthmani         String    @db.Text // Uthmani script (traditional)
+  textSimple          String    @db.Text // Simple/Imlaei script
+  textUthmaniTajweed  String?   @db.Text // Uthmani with Tajweed HTML markup
+
+  // Translations
+  translationEn       String?   @db.Text // English translation
+  translationFr       String?   @db.Text // French translation (optional)
+
+  // Audio
+  audioUrl            String?   // URL to audio file (e.g., Alafasy recitation)
+
+  // Metadata for navigation
+  juzNumber           Int?      // Juz (1-30)
+  hizbNumber          Int?      // Hizb (1-60)
+  rubNumber           Int?      // Rub (1-240)
+  pageNumber          Int?      // Mushaf page number
+
+  surah               Surah     @relation(fields: [surahId], references: [id])
+
+  @@index([verseKey])
+  @@index([surahId, verseNumber])
+  @@index([juzNumber])
+  @@index([pageNumber])
+}
+
+// Reciters - Audio recitation metadata
+model Reciter {
+  id              Int       @id @default(autoincrement())
+  identifier      String    @unique  // e.g., "ar.alafasy", "ar.minshawi"
+  nameArabic      String    // Arabic name
+  nameEnglish     String    // English name
+  style           String    // "Murattal", "Mujawwad", etc.
+
+  @@index([identifier])
+}
