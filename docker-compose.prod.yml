@@ -29,6 +29,15 @@ services:
       - .env.production
     networks:
       - shared-infra-network
+    labels:
+      # Traefik configuration for reverse proxy
+      # Access via: http://quran.147-79-115-54.nip.io (uses nip.io wildcard DNS)
+      # Or configure your own domain pointing to the VPS IP
+      - "traefik.enable=true"
+      - "traefik.http.routers.quran.rule=Host(`quran.147-79-115-54.nip.io`) || Host(`quran.local`)"
+      - "traefik.http.routers.quran.entrypoints=web"
+      - "traefik.http.services.quran.loadbalancer.server.port=3000"
+      - "traefik.docker.network=shared-infra-network"
     depends_on:
       quran-memorizer-migrate:
         condition: service_completed_successfully
