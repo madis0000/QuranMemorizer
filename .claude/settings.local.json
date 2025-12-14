@@ -37,7 +37,15 @@
       "Bash(git remote add:*)",
       "Bash(git add:*)",
       "Bash(git commit -m \"$(cat <<''EOF''\nInitial commit: Quran Memorizer - AI-Powered Memorization App\n\nFeatures:\n- 🎙️ Voice-based verse recognition with real-time search\n- 📝 Word-by-word memorization practice with speech recognition\n- 🎨 Tajweed highlighting with color-coded rules\n- 📊 Session summaries with confetti animations\n- 🗄️ PostgreSQL database with 6,236+ verses\n- 🔄 Auto-advance between verses\n- 🎯 Stuck word detection and hints\n- 📱 Responsive design with dark mode\n- 🌐 Offline-capable with database-first approach\n- 🎤 Memory mode with strictness levels\n- 📈 Progress tracking and analytics\n\nTech Stack:\n- Next.js 15 with App Router\n- React 18 + TypeScript\n- Prisma ORM + PostgreSQL\n- Tailwind CSS + shadcn/ui\n- Zustand for state management\n- Framer Motion for animations\n- Web Speech API for voice recognition\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
-      "Bash(git commit -m \"$(cat <<''EOF''\nInitial commit: Quran Memorizer - AI-Powered Memorization App\n\nFeatures:\n- Voice-based verse recognition with real-time search\n- Word-by-word memorization practice with speech recognition\n- Tajweed highlighting with color-coded rules\n- Session summaries with confetti animations\n- PostgreSQL database with 6,236+ verses\n- Auto-advance between verses\n- Stuck word detection and hints\n- Responsive design with dark mode\n- Offline-capable with database-first approach\n- Memory mode with strictness levels\n- Progress tracking and analytics\n\nTech Stack:\n- Next.js 15 with App Router\n- React 18 + TypeScript\n- Prisma ORM + PostgreSQL\n- Tailwind CSS + shadcn/ui\n- Zustand for state management\n- Framer Motion for animations\n- Web Speech API for voice recognition\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
+      "Bash(git commit -m \"$(cat <<''EOF''\nInitial commit: Quran Memorizer - AI-Powered Memorization App\n\nFeatures:\n- Voice-based verse recognition with real-time search\n- Word-by-word memorization practice with speech recognition\n- Tajweed highlighting with color-coded rules\n- Session summaries with confetti animations\n- PostgreSQL database with 6,236+ verses\n- Auto-advance between verses\n- Stuck word detection and hints\n- Responsive design with dark mode\n- Offline-capable with database-first approach\n- Memory mode with strictness levels\n- Progress tracking and analytics\n\nTech Stack:\n- Next.js 15 with App Router\n- React 18 + TypeScript\n- Prisma ORM + PostgreSQL\n- Tailwind CSS + shadcn/ui\n- Zustand for state management\n- Framer Motion for animations\n- Web Speech API for voice recognition\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push:*)",
+      "Bash(docker ps:*)",
+      "Bash(docker network ls:*)",
+      "Bash(docker-compose build:*)",
+      "Bash(docker-compose up:*)",
+      "Bash(docker info:*)",
+      "Bash(docker context:*)",
+      "Bash(docker-compose down:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,0 +1,59 @@
+# ============================================
+# Quran Memorizer - Local Development
+# Connects to shared infrastructure containers
+# ============================================
+#
+# Prerequisites:
+#   - Docker Desktop running
+#   - shared-infra-network exists
+#   - shared-postgres container running
+#
+# Usage:
+#   docker-compose up --build
+#   docker-compose down
+#
+# ============================================
+
+services:
+  quran-memorizer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: quran-memorizer
+    restart: unless-stopped
+    ports:
+      - "3002:3000"  # External:Internal - Use 3002 to avoid conflict with madisTrader (3000)
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://postgres:postgres@shared-postgres:5432/quran_memorizer?schema=public
+      # Quran API Configuration
+      - NEXT_PUBLIC_QURAN_CLIENT_ID=${NEXT_PUBLIC_QURAN_CLIENT_ID}
+      - NEXT_PUBLIC_QURAN_CLIENT_SECRET=${NEXT_PUBLIC_QURAN_CLIENT_SECRET}
+      - NEXT_PUBLIC_QURAN_OAUTH_ENDPOINT=${NEXT_PUBLIC_QURAN_OAUTH_ENDPOINT}
+      - NEXT_PUBLIC_QURAN_API_BASE_URL=${NEXT_PUBLIC_QURAN_API_BASE_URL}
+    networks:
+      - shared-infra-network
+    depends_on:
+      quran-memorizer-migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Migration service - runs once to set up database
+  quran-memorizer-migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile.migrate
+    container_name: quran-memorizer-migrate
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@shared-postgres:5432/quran_memorizer?schema=public
+    networks:
+      - shared-infra-network
+
+networks:
+  shared-infra-network:
+    external: true

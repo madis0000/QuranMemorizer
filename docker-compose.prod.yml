@@ -1,0 +1,73 @@
+# ============================================
+# Quran Memorizer - Production Deployment
+# For VPS deployment with external shared infra
+# ============================================
+#
+# Usage:
+#   docker-compose -f docker-compose.prod.yml up -d --build
+#   docker-compose -f docker-compose.prod.yml down
+#
+# Environment Variables Required:
+#   - DATABASE_URL
+#   - NEXT_PUBLIC_QURAN_CLIENT_ID
+#   - NEXT_PUBLIC_QURAN_CLIENT_SECRET
+#   - NEXT_PUBLIC_QURAN_OAUTH_ENDPOINT
+#   - NEXT_PUBLIC_QURAN_API_BASE_URL
+#
+# ============================================
+
+services:
+  quran-memorizer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: quran-memorizer
+    restart: always
+    ports:
+      - "3002:3000"  # External:Internal - Use 3002 to avoid conflict with other apps
+    env_file:
+      - .env.production
+    networks:
+      - shared-infra-network
+    depends_on:
+      quran-memorizer-migrate:
+        condition: service_completed_successfully
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Migration service - runs once on deployment
+  quran-memorizer-migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile.migrate
+    container_name: quran-memorizer-migrate
+    env_file:
+      - .env.production
+    networks:
+      - shared-infra-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+
+networks:
+  shared-infra-network:
+    external: true

@@ -110,7 +110,7 @@ export function splitTajweedHtmlByWords(tajweedHtml: string): TajweedWord[] {
 
   // Remove verse number markers (e.g., <span class=end>٤</span>) before processing
   // These are visual markers and should not be counted as words to memorize
-  let cleanedHtml = tajweedHtml.replace(/<span[^>]*class=["']?end["']?[^>]*>.*?<\/span>/gi, '');
+  const cleanedHtml = tajweedHtml.replace(/<span[^>]*class=["']?end["']?[^>]*>.*?<\/span>/gi, '');
 
   // Step 1: Extract plain text and split into words
   const plainText = stripHtmlTags(cleanedHtml);
